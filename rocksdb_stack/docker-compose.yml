@@ -1,0 +1,41 @@
+version: "3"
+services:
+
+  db:
+#    image: mariadb:10.3-focal
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-basename=mylogs --log-bin=mysqld-bin --binlog-format=ROW
+    environment:
+      LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so.2
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+      MYSQL_CHARACTER_SET: utf8
+      MYSQL_COLLATE: utf8_bin
+      MYSQL_DATABASE_FILE: /run/secrets/mysql_database
+      MYSQL_USER_FILE: /run/secrets/mysql_user
+      MYSQL_PASSWORD_FILE: /run/secrets/mysql_password
+    secrets:
+      - mysql_database
+      - mysql_password
+      - mysql_user
+    ports:
+      - 3306:3306
+    networks:
+      - some-network
+    volumes:
+      - "rocksdb_volumes/mariadb:/var/lib/mysql"
+#      - ./docker/provision/mariadb/init:/docker-entrypoint-initdb.d
+      - ./conf.d:/etc/mysql/conf.d
+  
+networks:
+  some-network:  
+  
+secrets:
+  mysql_database:
+    file: ./mysql_database.txt # put db name to this file
+  mysql_password:
+    file: ./mysql_password.txt # put password to this file
+  mysql_user:
+    file: ./mysql_user.txt # put username to this file  
