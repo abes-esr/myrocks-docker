@@ -25,12 +25,15 @@ services:
     networks:
       - some-network
     volumes:
-      - "rocksdb_volumes/mariadb:/var/lib/mysql"
+      - "rocksdb_volumes:/var/lib/mysql"
 #      - ./docker/provision/mariadb/init:/docker-entrypoint-initdb.d
-      - ./conf.d:/etc/mysql/conf.d
+      - ./conf.d:/etc/mysql/conf.d:ro
   
 networks:
-  some-network:  
+  some-network:
+
+volumes:
+  rocksdb_volumes:
   
 secrets:
   mysql_database:
